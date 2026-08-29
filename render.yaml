@@ -1,9 +1,9 @@
 # StockBox — Render Blueprint
-# https://render.com/docs/infrastructure-as-code
+# Vertical slice: static web + Node paper-trading API
 
 services:
   - type: web
-    name: stockbox
+    name: stockbox-web
     runtime: static
     buildCommand: npm ci && npm run build
     staticPublishPath: dist
@@ -18,3 +18,32 @@ services:
       - path: /*
         name: Referrer-Policy
         value: strict-origin-when-cross-origin
+    envVars:
+      - key: VITE_API_URL
+        fromService:
+          name: stockbox-api
+          type: web
+          property: host
+
+  - type: web
+    name: stockbox-api
+    runtime: node
+    plan: starter
+    buildCommand: npm ci
+    startCommand: npm run start:api
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: TRADING_MODE
+        value: PAPER
+      - key: ENABLE_LIVE_TRADING
+        value: "false"
+      - key: ALPACA_API_KEY
+        sync: false
+      - key: ALPACA_SECRET_KEY
+        sync: false
+      - key: ALPACA_BASE_URL
+        value: https://paper-api.alpaca.markets
+      - key: OPENAI_API_KEY
+        sync: false
