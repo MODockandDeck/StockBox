@@ -20,10 +20,7 @@ services:
         value: strict-origin-when-cross-origin
     envVars:
       - key: VITE_API_URL
-        fromService:
-          name: stockbox-api
-          type: web
-          property: host
+        sync: false
 
   - type: web
     name: stockbox-api
