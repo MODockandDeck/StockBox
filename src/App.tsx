@@ -1,5 +1,6 @@
 import { useId, useState, type FormEvent } from 'react'
 import heroImg from './assets/hero.jpg'
+import { Dashboard } from './pages/Dashboard'
 import {
   SEED_TRADES,
   SEED_WATCHLIST,
@@ -11,7 +12,10 @@ import {
 } from './data'
 import './App.css'
 
+type View = 'home' | 'desk'
+
 function App() {
+  const [view, setView] = useState<View>('home')
   const formId = useId()
   const [trades, setTrades] = useState<Trade[]>(SEED_TRADES)
   const [symbol, setSymbol] = useState('NVDA')
@@ -39,6 +43,10 @@ function App() {
     setNotes('')
   }
 
+  if (view === 'desk') {
+    return <Dashboard onBack={() => setView('home')} />
+  }
+
   return (
     <div className="app">
       <header className="topbar">
@@ -49,8 +57,15 @@ function App() {
           StockBox
         </a>
         <nav className="topbar__nav" aria-label="Primary">
-          <a href="#journal">Journal</a>
-          <a href="#watchlist">Watchlist</a>
+          <button type="button" onClick={() => setView('desk')}>
+            Paper desk
+          </button>
+          <a href="#journal" onClick={() => setView('home')}>
+            Journal
+          </a>
+          <a href="#watchlist" onClick={() => setView('home')}>
+            Watchlist
+          </a>
         </nav>
       </header>
 
@@ -68,15 +83,15 @@ function App() {
             </p>
             <h1 className="hero__title">Capture every killer trade.</h1>
             <p className="hero__lede">
-              A focused journal for setups, exits, and the edge you actually
-              keep.
+              Paper-trading vertical slice with Alpaca-ready execution, risk
+              controls, and a full decision trail.
             </p>
             <div className="hero__actions">
-              <a className="btn btn--primary" href="#journal">
-                Open journal
-              </a>
-              <a className="btn btn--ghost" href="#watchlist">
-                View watchlist
+              <button type="button" className="btn btn--primary" onClick={() => setView('desk')}>
+                Open paper desk
+              </button>
+              <a className="btn btn--ghost" href="#journal">
+                Manual journal
               </a>
             </div>
           </div>
@@ -235,7 +250,7 @@ function App() {
 
       <footer className="footer">
         <p>StockBox · Killer trades, logged clean.</p>
-        <p className="footer__meta">Deploy with Render Blueprint (`render.yaml`).</p>
+        <p className="footer__meta">Paper desk defaults to simulation until Alpaca keys are set.</p>
       </footer>
     </div>
   )
