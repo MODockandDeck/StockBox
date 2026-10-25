@@ -44,15 +44,17 @@ npm run build           # frontend production build
 
 Live trading is intentionally hard to enable.
 
-## Deploy on Render
+## Deploy on Render (public)
 
-`render.yaml` defines:
+`render.yaml` defines one free public web service: **`stockbox`**.
 
-- `stockbox-web` — static frontend
-- `stockbox-api` — Node API (set Alpaca secrets in the dashboard)
-- `stockbox-scanner` — worker placeholder for the execution path
+It builds the Vite UI into `dist/` and the Node API serves both the SPA and `/api/*` on the same origin (simulation broker if Alpaca keys are empty).
 
-Create a Blueprint from this repo in the Render dashboard and supply `ALPACA_API_KEY` / `ALPACA_SECRET_KEY`.
+1. In the [Render Dashboard](https://dashboard.render.com), **New → Blueprint** and connect this repo.
+2. Optionally set `ALPACA_API_KEY` / `ALPACA_SECRET_KEY` for paper trading (otherwise simulation).
+3. After deploy, open `https://stockbox.onrender.com` (or the unique URL Render shows).
+
+Free instances spin down after idle time; the first request may take ~30–60s to wake.
 
 ## API surface
 
