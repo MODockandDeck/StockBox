@@ -10,6 +10,9 @@
     "build": "tsc -b && vite build",
     "build:api": "tsc -p api/tsconfig.json",
     "start:api": "tsx api/src/index.ts",
+    "start": "npm run start:api",
+    "deploy:check": "npm run build && npm run test:pipeline",
+
     "lint": "oxlint",
     "preview": "vite preview",
     "test:pipeline": "tsx api/src/scripts/smoke.ts"

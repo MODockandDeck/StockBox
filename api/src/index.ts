@@ -1,5 +1,8 @@
 import cors from 'cors'
 import express from 'express'
+import fs from 'node:fs'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { createBroker } from './broker/index.js'
 import { config } from './config.js'
 import { runPaperPipeline, createStore } from './pipeline/runScan.js'
@@ -14,20 +17,34 @@ const app = express()
 app.use(cors())
 app.use(express.json())
 
-app.get('/', (_req, res) => {
-  res.json({
-    name: 'StockBox Trading API',
-    mode: config.mode,
-    broker: broker.name,
-    docs: {
-      health: '/api/health',
-      dashboard: '/api/dashboard',
-      runPipeline: 'POST /api/pipeline/run',
-    },
-  })
-})
-
 app.use('/api', createRoutes({ config, broker, risk, store }))
+
+const distDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../dist')
+const hasFrontend = fs.existsSync(path.join(distDir, 'index.html'))
+
+if (hasFrontend) {
+  app.use(express.static(distDir, { index: false, maxAge: '1h' }))
+  app.get(/.*/, (req, res, next) => {
+    if (req.path.startsWith('/api')) {
+      next()
+      return
+    }
+    res.sendFile(path.join(distDir, 'index.html'))
+  })
+} else {
+  app.get('/', (_req, res) => {
+    res.json({
+      name: 'StockBox Trading API',
+      mode: config.mode,
+      broker: broker.name,
+      docs: {
+        health: '/api/health',
+        dashboard: '/api/dashboard',
+        runPipeline: 'POST /api/pipeline/run',
+      },
+    })
+  })
+}
 
 app.use((error: unknown, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
   const message = error instanceof Error ? error.message : 'Unexpected error'
